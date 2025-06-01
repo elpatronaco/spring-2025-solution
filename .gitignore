@@ -79,5 +79,3 @@ Thumbs.db
 # Spring Boot
 .spring-boot-devtools
 .cursorignore
-
-target/
