@@ -50,7 +50,7 @@ public class DigitalItemRESTControllerUnitTest {
         when(digitalItemService.findDigitalItemBySession(sessionId)).thenReturn(expectedItems);
 
         // Act
-        List<DigitalItem> result = digitalItemRESTController.getDigitalItemBySession(sessionId);
+        List<DigitalItem> result = digitalItemRESTController.findDigitalItemBySession(sessionId);
 
         // Assert
         assertEquals(expectedItems, result);

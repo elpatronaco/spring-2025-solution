@@ -2,6 +2,7 @@ package edu.uoc.epcsd.user;
 
 import edu.uoc.epcsd.user.domain.DigitalSession;
 import edu.uoc.epcsd.user.domain.repository.DigitalSessionRepository;
+import edu.uoc.epcsd.user.domain.repository.UserRepository;
 import edu.uoc.epcsd.user.domain.service.DigitalSessionService;
 import edu.uoc.epcsd.user.domain.service.DigitalSessionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,15 +23,15 @@ import edu.uoc.epcsd.user.application.rest.response.GetUserResponseTest;
 
 public class DigitalSessionServiceUnitTest {
     DigitalSessionRepository digitalSessionRepository;
-    RestTemplate restTemplate;
+    UserRepository userRepository;
     DigitalSessionService digitalSessionService;
 
     @BeforeEach
     void setUp() {
         digitalSessionRepository = mock(DigitalSessionRepository.class);
-        restTemplate = mock(RestTemplate.class);
+        userRepository = mock(UserRepository.class);
 
-        digitalSessionService = new DigitalSessionServiceImpl(digitalSessionRepository, restTemplate);
+        digitalSessionService = new DigitalSessionServiceImpl(digitalSessionRepository, userRepository);
 
         // declarem la propietat privada getUserById a un valor
         try {
@@ -71,9 +72,6 @@ public class DigitalSessionServiceUnitTest {
                 .email("test@example.com")
                 .phoneNumber("123456789")
                 .build();
-
-        when(restTemplate.getForEntity(anyString(), eq(GetUserResponseTest.class), eq(userId)))
-                .thenReturn(new ResponseEntity<>(userResponse, HttpStatus.OK));
 
         // Act
         List<DigitalSession> sessions = digitalSessionService.findDigitalSessionByUser(userId);
