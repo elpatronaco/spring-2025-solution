@@ -1,6 +1,8 @@
 package edu.uoc.epcsd.user;
 
 import edu.uoc.epcsd.user.domain.DigitalSession;
+import edu.uoc.epcsd.user.domain.User;
+import edu.uoc.epcsd.user.domain.exception.UserNotFoundException;
 import edu.uoc.epcsd.user.domain.repository.DigitalSessionRepository;
 import edu.uoc.epcsd.user.domain.repository.UserRepository;
 import edu.uoc.epcsd.user.domain.service.DigitalSessionService;
@@ -17,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import java.lang.reflect.Field;
+import java.util.Optional;
 
 import edu.uoc.epcsd.user.application.rest.response.GetUserResponseTest;
 
@@ -32,15 +34,6 @@ public class DigitalSessionServiceUnitTest {
         userRepository = mock(UserRepository.class);
 
         digitalSessionService = new DigitalSessionServiceImpl(digitalSessionRepository, userRepository);
-
-        // declarem la propietat privada getUserById a un valor
-        try {
-            Field field = digitalSessionService.getClass().getDeclaredField("getUserById");
-            field.setAccessible(true);
-            field.set(digitalSessionService, "http://dummy-url/{userId}");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Test
@@ -64,6 +57,16 @@ public class DigitalSessionServiceUnitTest {
                         .userId(userId)
                         .build());
 
+        // Mock the user repository to return a user
+        User user = User.builder()
+                .id(userId)
+                .fullName("Test User")
+                .email("test@example.com")
+                .password("password")
+                .phoneNumber("123456789")
+                .build();
+                
+        when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
         when(digitalSessionRepository.findDigitalSessionByUser(userId)).thenReturn(expectedSessions);
 
         GetUserResponseTest userResponse = GetUserResponseTest.builder()
@@ -89,9 +92,13 @@ public class DigitalSessionServiceUnitTest {
     void shouldThrowExceptionIfUserIdIsNotFound() {
         // Arrange
         Long userId = 1L;
-        when(digitalSessionRepository.findDigitalSessionByUser(userId)).thenReturn(null);
+        
+        // Mock user repository to return empty (user not found)
+        when(userRepository.findUserById(userId)).thenReturn(Optional.empty());
+        
+        // We don't need to mock digitalSessionRepository here since the exception will be thrown before it's called
 
-        // Act
-        assertThrows(NullPointerException.class, () -> digitalSessionService.findDigitalSessionByUser(userId));
+        // Act & Assert - should throw UserNotFoundException
+        assertThrows(UserNotFoundException.class, () -> digitalSessionService.findDigitalSessionByUser(userId));
     }
 }
