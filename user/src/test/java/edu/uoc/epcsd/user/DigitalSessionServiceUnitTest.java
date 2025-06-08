@@ -57,7 +57,6 @@ public class DigitalSessionServiceUnitTest {
                         .userId(userId)
                         .build());
 
-        // Mock the user repository to return a user
         User user = User.builder()
                 .id(userId)
                 .fullName("Test User")
