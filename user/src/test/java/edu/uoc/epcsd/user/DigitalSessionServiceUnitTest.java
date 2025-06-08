@@ -92,13 +92,8 @@ public class DigitalSessionServiceUnitTest {
     void shouldThrowExceptionIfUserIdIsNotFound() {
         // Arrange
         Long userId = 1L;
-        
-        // Mock user repository to return empty (user not found)
         when(userRepository.findUserById(userId)).thenReturn(Optional.empty());
-        
-        // We don't need to mock digitalSessionRepository here since the exception will be thrown before it's called
 
-        // Act & Assert - should throw UserNotFoundException
         assertThrows(UserNotFoundException.class, () -> digitalSessionService.findDigitalSessionByUser(userId));
     }
 }
